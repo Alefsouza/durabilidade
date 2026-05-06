@@ -39,45 +39,51 @@ export function TestEvolutionChart() {
         <CardTitle>Evolução de Testes</CardTitle>
       </CardHeader>
       <CardContent>
-        <ChartContainer
-          config={{
-            testes: { label: 'Testes Iniciados', color: '#6b7280' },
-          }}
-          className="h-[300px] w-full"
-        >
-          <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              vertical={false}
-              stroke="hsl(var(--muted-foreground)/0.2)"
-            />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={10}
-              fontSize={12}
-              stroke="hsl(var(--muted-foreground))"
-            />
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              tickMargin={10}
-              fontSize={12}
-              allowDecimals={false}
-              stroke="hsl(var(--muted-foreground))"
-            />
-            <ChartTooltip content={<ChartTooltipContent />} />
-            <Line
-              type="monotone"
-              dataKey="testes"
-              stroke="var(--color-testes)"
-              strokeWidth={2}
-              dot={{ r: 4, fill: 'var(--color-testes)', strokeWidth: 0 }}
-              activeDot={{ r: 6, strokeWidth: 0 }}
-            />
-          </LineChart>
-        </ChartContainer>
+        {chartData.length === 0 ? (
+          <div className="flex h-[300px] w-full items-center justify-center text-sm text-muted-foreground">
+            Nenhum dado encontrado para os filtros selecionados.
+          </div>
+        ) : (
+          <ChartContainer
+            config={{
+              testes: { label: 'Testes Iniciados', color: '#6b7280' },
+            }}
+            className="h-[300px] w-full"
+          >
+            <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="hsl(var(--muted-foreground)/0.2)"
+              />
+              <XAxis
+                dataKey="month"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={10}
+                fontSize={12}
+                stroke="hsl(var(--muted-foreground))"
+              />
+              <YAxis
+                tickLine={false}
+                axisLine={false}
+                tickMargin={10}
+                fontSize={12}
+                allowDecimals={false}
+                stroke="hsl(var(--muted-foreground))"
+              />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Line
+                type="monotone"
+                dataKey="testes"
+                stroke="var(--color-testes)"
+                strokeWidth={2}
+                dot={{ r: 4, fill: 'var(--color-testes)', strokeWidth: 0 }}
+                activeDot={{ r: 6, strokeWidth: 0 }}
+              />
+            </LineChart>
+          </ChartContainer>
+        )}
       </CardContent>
     </Card>
   )

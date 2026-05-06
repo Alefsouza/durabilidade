@@ -193,10 +193,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     let result = currentBranch === 'Todas' ? tests : tests.filter((t) => t.branch === currentBranch)
     if (dateFilter) {
       const fromTime = new Date(dateFilter.from).getTime()
-      const toTime = new Date(dateFilter.to).getTime()
+      // Adjust to end of day to include the full 'to' date
+      const toTime = new Date(dateFilter.to).getTime() + 86400000 - 1
       result = result.filter((t) => {
         const startTime = new Date(t.startDate).getTime()
-        const endTime = t.endDate ? new Date(t.endDate).getTime() : new Date().getTime()
+        const endTime = t.endDate
+          ? new Date(t.endDate).getTime() + 86400000 - 1
+          : new Date().getTime()
         return startTime <= toTime && endTime >= fromTime
       })
     }

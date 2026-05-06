@@ -44,69 +44,77 @@ export function BranchAnalysisChart() {
         <CardTitle>Análise por Filial</CardTitle>
       </CardHeader>
       <CardContent className="pl-0 pb-4">
-        <ChartContainer
-          config={{
-            aprovado: { label: 'Aprovados', color: 'hsl(var(--success))' },
-            reprovado: { label: 'Reprovados', color: 'hsl(var(--destructive))' },
-            emTeste: { label: 'Em teste', color: '#FEF9C3' },
-          }}
-          className="h-[300px] w-full"
-        >
-          <BarChart data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
-            <CartesianGrid vertical={false} />
-            <XAxis dataKey="branch" tickLine={false} tickMargin={10} axisLine={false} />
-            <YAxis tickLine={false} axisLine={false} tickMargin={10} />
-
-            <ChartTooltip
-              cursor={false}
-              content={({ active, payload }) => {
-                if (!active || !payload?.length) return null
-                const data = payload[0].payload
-                const configLabel =
-                  data.status === 'aprovado'
-                    ? 'Aprovados'
-                    : data.status === 'reprovado'
-                      ? 'Reprovados'
-                      : 'Em teste'
-                return (
-                  <div className="rounded-lg border bg-background p-2 shadow-sm">
-                    <div className="flex items-center gap-2">
-                      <div className="h-2 w-2 rounded-full" style={{ background: data.fill }} />
-                      <span className="text-xs text-muted-foreground">{configLabel}</span>
-                      <span className="text-xs font-bold">{data.value}</span>
-                    </div>
-                  </div>
-                )
+        {chartData.length === 0 ? (
+          <div className="flex h-[300px] w-full items-center justify-center text-sm text-muted-foreground">
+            Nenhum dado encontrado para os filtros selecionados.
+          </div>
+        ) : (
+          <>
+            <ChartContainer
+              config={{
+                aprovado: { label: 'Aprovados', color: 'hsl(var(--success))' },
+                reprovado: { label: 'Reprovados', color: 'hsl(var(--destructive))' },
+                emTeste: { label: 'Em teste', color: '#FEF9C3' },
               }}
-            />
+              className="h-[300px] w-full"
+            >
+              <BarChart data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
+                <CartesianGrid vertical={false} />
+                <XAxis dataKey="branch" tickLine={false} tickMargin={10} axisLine={false} />
+                <YAxis tickLine={false} axisLine={false} tickMargin={10} />
 
-            <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={40}>
-              {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.fill} />
-              ))}
-              <LabelList
-                dataKey="value"
-                position="top"
-                className="fill-foreground opacity-80 text-xs font-medium"
-              />
-            </Bar>
-          </BarChart>
-        </ChartContainer>
+                <ChartTooltip
+                  cursor={false}
+                  content={({ active, payload }) => {
+                    if (!active || !payload?.length) return null
+                    const data = payload[0].payload
+                    const configLabel =
+                      data.status === 'aprovado'
+                        ? 'Aprovados'
+                        : data.status === 'reprovado'
+                          ? 'Reprovados'
+                          : 'Em teste'
+                    return (
+                      <div className="rounded-lg border bg-background p-2 shadow-sm">
+                        <div className="flex items-center gap-2">
+                          <div className="h-2 w-2 rounded-full" style={{ background: data.fill }} />
+                          <span className="text-xs text-muted-foreground">{configLabel}</span>
+                          <span className="text-xs font-bold">{data.value}</span>
+                        </div>
+                      </div>
+                    )
+                  }}
+                />
 
-        <div className="flex items-center justify-center gap-4 pt-4">
-          <div className="flex items-center gap-1.5">
-            <div className="h-3 w-3 rounded-[2px] bg-[hsl(var(--success))]"></div>
-            <span className="text-xs text-muted-foreground">Aprovados</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="h-3 w-3 rounded-[2px] bg-[hsl(var(--destructive))]"></div>
-            <span className="text-xs text-muted-foreground">Reprovados</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="h-3 w-3 rounded-[2px] bg-[#FEF9C3]"></div>
-            <span className="text-xs text-muted-foreground">Em teste</span>
-          </div>
-        </div>
+                <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={40}>
+                  {chartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                  <LabelList
+                    dataKey="value"
+                    position="top"
+                    className="fill-foreground opacity-80 text-xs font-medium"
+                  />
+                </Bar>
+              </BarChart>
+            </ChartContainer>
+
+            <div className="flex items-center justify-center gap-4 pt-4">
+              <div className="flex items-center gap-1.5">
+                <div className="h-3 w-3 rounded-[2px] bg-[hsl(var(--success))]"></div>
+                <span className="text-xs text-muted-foreground">Aprovados</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="h-3 w-3 rounded-[2px] bg-[hsl(var(--destructive))]"></div>
+                <span className="text-xs text-muted-foreground">Reprovados</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="h-3 w-3 rounded-[2px] bg-[#FEF9C3]"></div>
+                <span className="text-xs text-muted-foreground">Em teste</span>
+              </div>
+            </div>
+          </>
+        )}
       </CardContent>
     </Card>
   )

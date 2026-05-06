@@ -14,16 +14,22 @@ import { Filter, X } from 'lucide-react'
 
 export function FilterBar({ hideDate = false }: { hideDate?: boolean }) {
   const { currentBranch, setCurrentBranch, dateFilter, setDateFilter } = useAppStore()
+  const [localBranch, setLocalBranch] = useState<Branch>(currentBranch)
   const [from, setFrom] = useState(dateFilter?.from || '')
   const [to, setTo] = useState(dateFilter?.to || '')
 
   const handleApply = () => {
+    setCurrentBranch(localBranch)
     if (from && to) {
       setDateFilter({ from, to })
+    } else {
+      setDateFilter(null)
     }
   }
 
   const handleClear = () => {
+    setLocalBranch('Todas')
+    setCurrentBranch('Todas')
     setFrom('')
     setTo('')
     setDateFilter(null)
@@ -38,7 +44,7 @@ export function FilterBar({ hideDate = false }: { hideDate?: boolean }) {
       <div className="flex-1 flex flex-col sm:flex-row gap-4">
         <div className="flex flex-col gap-1.5">
           <label className="text-xs text-muted-foreground">Filial</label>
-          <Select value={currentBranch} onValueChange={(v) => setCurrentBranch(v as Branch)}>
+          <Select value={localBranch} onValueChange={(v) => setLocalBranch(v as Branch)}>
             <SelectTrigger className="w-[180px] h-9">
               <SelectValue placeholder="Todas as Filiais" />
             </SelectTrigger>
@@ -78,18 +84,42 @@ export function FilterBar({ hideDate = false }: { hideDate?: boolean }) {
                 <Button size="sm" variant="secondary" onClick={handleApply}>
                   Aplicar
                 </Button>
-                {dateFilter && (
+                {dateFilter ||
+                currentBranch !== 'Todas' ||
+                from ||
+                to ||
+                localBranch !== 'Todas' ? (
                   <Button
                     size="icon"
                     variant="ghost"
                     className="h-9 w-9"
                     onClick={handleClear}
-                    title="Limpar Período"
+                    title="Limpar Filtros"
                   >
                     <X className="h-4 w-4" />
                   </Button>
-                )}
+                ) : null}
               </div>
+            </div>
+          </div>
+        )}
+        {hideDate && (
+          <div className="flex flex-col gap-1.5 justify-end h-full">
+            <div className="flex gap-2">
+              <Button size="sm" variant="secondary" onClick={handleApply}>
+                Aplicar
+              </Button>
+              {currentBranch !== 'Todas' || localBranch !== 'Todas' ? (
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-9 w-9"
+                  onClick={handleClear}
+                  title="Limpar Filtros"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              ) : null}
             </div>
           </div>
         )}
