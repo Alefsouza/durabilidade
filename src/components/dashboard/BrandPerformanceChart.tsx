@@ -32,11 +32,19 @@ export function BrandPerformanceChart() {
       }
     })
 
-    const flatData: { brand: string; status: string; value: number; fill: string }[] = []
+    const flatData: {
+      id: string
+      brand: string
+      status: string
+      value: number
+      fill: string
+      isDummy?: boolean
+    }[] = []
 
     Array.from(brandMap.values()).forEach((stat) => {
       if (stat.aprovado > 0)
         flatData.push({
+          id: `${stat.brand}-aprovado`,
           brand: stat.brand,
           status: 'aprovado',
           value: stat.aprovado,
@@ -44,6 +52,7 @@ export function BrandPerformanceChart() {
         })
       if (stat.reprovado > 0)
         flatData.push({
+          id: `${stat.brand}-reprovado`,
           brand: stat.brand,
           status: 'reprovado',
           value: stat.reprovado,
@@ -51,12 +60,28 @@ export function BrandPerformanceChart() {
         })
       if (stat.emTeste > 0)
         flatData.push({
+          id: `${stat.brand}-emTeste`,
           brand: stat.brand,
           status: 'emTeste',
           value: stat.emTeste,
           fill: 'var(--color-emTeste)',
         })
     })
+
+    const MIN_BARS = 8
+    if (flatData.length > 0 && flatData.length < MIN_BARS) {
+      const padding = MIN_BARS - flatData.length
+      for (let i = 0; i < padding; i++) {
+        flatData.push({
+          id: `dummy-${i}`,
+          brand: ' '.repeat(i + 1), // Invisible but unique string
+          status: 'dummy',
+          value: 0,
+          fill: 'transparent',
+          isDummy: true,
+        })
+      }
+    }
 
     return flatData
   }, [filteredTests, materials])
@@ -77,7 +102,13 @@ export function BrandPerformanceChart() {
         >
           <BarChart data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
             <CartesianGrid vertical={false} />
-            <XAxis dataKey="brand" tickLine={false} tickMargin={10} axisLine={false} />
+            <XAxis
+              dataKey="brand"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+              tickFormatter={(value) => (value.trim() === '' ? '' : value)}
+            />
             <YAxis tickLine={false} axisLine={false} tickMargin={10} />
 
             <ChartTooltip
@@ -85,6 +116,8 @@ export function BrandPerformanceChart() {
               content={({ active, payload }) => {
                 if (!active || !payload?.length) return null
                 const data = payload[0].payload
+                if (data.isDummy) return null
+
                 const configLabel =
                   data.status === 'aprovado'
                     ? 'Aprovados'
@@ -104,13 +137,14 @@ export function BrandPerformanceChart() {
             />
 
             <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={40}>
-              {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.fill} />
+              {chartData.map((entry) => (
+                <Cell key={entry.id} fill={entry.fill} />
               ))}
               <LabelList
                 dataKey="value"
                 position="top"
                 className="fill-foreground opacity-80 text-xs font-medium"
+                formatter={(value: number) => (value > 0 ? value : '')}
               />
             </Bar>
           </BarChart>
