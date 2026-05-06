@@ -4,6 +4,8 @@ import { Material, TestRecord, Branch, Status } from '@/types'
 interface AppContextType {
   currentBranch: Branch
   setCurrentBranch: (branch: Branch) => void
+  dateFilter: { from: string; to: string } | null
+  setDateFilter: (range: { from: string; to: string } | null) => void
   materials: Material[]
   addMaterial: (material: Omit<Material, 'id'>) => void
   tests: TestRecord[]
@@ -109,6 +111,7 @@ const AppContext = createContext<AppContextType | null>(null)
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [currentBranch, setCurrentBranch] = useState<Branch>('Todas')
+  const [dateFilter, setDateFilter] = useState<{ from: string; to: string } | null>(null)
   const [materials, setMaterials] = useState<Material[]>(mockMaterials)
   const [tests, setTests] = useState<TestRecord[]>(mockTests)
 
@@ -118,13 +121,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }
 
   const startTest = (test: Omit<TestRecord, 'id' | 'status'>) => {
-    const newTest: TestRecord = {
-      ...test,
-      id: Math.random().toString(36).substr(2, 9),
-      status: 'ativo',
-      currentKm: test.startKm,
-    }
-    setTests((prev) => [...prev, newTest])
+    setTests((prev) => {
+      const updatedTests = prev.map((t) => {
+        if (t.status === 'ativo' && t.prefix === test.prefix && t.position === test.position) {
+          const material = materials.find((m) => m.id === t.materialId)
+          const expected = material?.expectedKm || 0
+          const achieved = test.startKm - t.startKm
+          const status: Status = achieved >= expected ? 'aprovado' : 'reprovado'
+          return { ...t, finalKm: test.startKm, endDate: test.startDate, status }
+        }
+        return t
+      })
+
+      const newTest: TestRecord = {
+        ...test,
+        id: Math.random().toString(36).substr(2, 9),
+        status: 'ativo',
+        currentKm: test.startKm,
+      }
+      return [...updatedTests, newTest]
+    })
   }
 
   const endTest = (id: string, finalKm: number, endDate: string) => {
@@ -153,12 +169,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [materials, currentBranch])
 
   const filteredTests = useMemo(() => {
-    return currentBranch === 'Todas' ? tests : tests.filter((t) => t.branch === currentBranch)
-  }, [tests, currentBranch])
+    let result = currentBranch === 'Todas' ? tests : tests.filter((t) => t.branch === currentBranch)
+    if (dateFilter) {
+      const fromTime = new Date(dateFilter.from).getTime()
+      const toTime = new Date(dateFilter.to).getTime()
+      result = result.filter((t) => {
+        const startTime = new Date(t.startDate).getTime()
+        const endTime = t.endDate ? new Date(t.endDate).getTime() : new Date().getTime()
+        return startTime <= toTime && endTime >= fromTime
+      })
+    }
+    return result
+  }, [tests, currentBranch, dateFilter])
 
   const value = {
     currentBranch,
     setCurrentBranch,
+    dateFilter,
+    setDateFilter,
     materials,
     addMaterial,
     tests,

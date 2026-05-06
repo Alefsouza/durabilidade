@@ -30,18 +30,19 @@ export function StartTestDialog() {
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Validation: Check if there's already an active test for this prefix and position
     const isOccupied = tests.some(t => t.status === 'ativo' && t.prefix === values.prefix && t.position === values.position)
-    if (isOccupied) {
-      toast({ title: 'Atenção', description: 'Já existe um teste ativo para este prefixo e posição. Finalize-o primeiro.', variant: 'destructive' })
-      return
-    }
-
+    
     const material = filteredMaterials.find(m => m.id === values.materialId)
     if (!material) return
 
     startTest({ ...values, branch: material.branch })
-    toast({ title: 'Teste Iniciado', description: 'O material foi instalado e o teste está em andamento.' })
+    
+    if (isOccupied) {
+      toast({ title: 'Substituição Registrada', description: 'O teste anterior foi finalizado automaticamente com a KM atual.' })
+    } else {
+      toast({ title: 'Teste Iniciado', description: 'O material foi instalado e o teste está em andamento.' })
+    }
+    
     setOpen(false)
     form.reset()
   }

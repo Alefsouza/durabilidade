@@ -2,6 +2,7 @@ import { useAppStore } from '@/store/use-app-store'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
+import { FilterBar } from '@/components/FilterBar'
 
 export default function HistoryTestsPage() {
   const { filteredTests, filteredMaterials } = useAppStore()
@@ -15,6 +16,8 @@ export default function HistoryTestsPage() {
         <h2 className="text-2xl font-bold tracking-tight">Histórico de Testes</h2>
         <p className="text-muted-foreground">Registro de todas as peças que já finalizaram o ciclo de testes.</p>
       </div>
+      
+      <FilterBar />
 
       <Card className="border-border/50 shadow-subtle">
         <CardHeader className="py-4">
@@ -24,12 +27,13 @@ export default function HistoryTestsPage() {
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
-                <TableHead>Resultado</TableHead>
-                <TableHead>Veículo / Posição</TableHead>
-                <TableHead>Peça (Fornecedor)</TableHead>
-                <TableHead>Período</TableHead>
-                <TableHead className="text-right">KM Realizado</TableHead>
-                <TableHead className="text-right">KM Esperado</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Item / Fornecedor</TableHead>
+                <TableHead>Veículo (Prefixo)</TableHead>
+                <TableHead>Data Início - Fim</TableHead>
+                <TableHead className="text-right">KM Inicial</TableHead>
+                <TableHead className="text-right">KM Final</TableHead>
+                <TableHead className="text-right">Valid. (Total / Esperado)</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -48,22 +52,32 @@ export default function HistoryTestsPage() {
                       </Badge>
                     </TableCell>
                     <TableCell>
+                      <div className="font-medium">{material?.name || '---'}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {material?.supplier || '---'} (Cod: {material?.partNumber || '---'})
+                      </div>
+                    </TableCell>
+                    <TableCell>
                       <div className="font-semibold">{test.prefix}</div>
                       <div className="text-xs text-muted-foreground">{test.position}</div>
                     </TableCell>
-                    <TableCell>
-                      <div className="font-medium">{material?.name || '---'}</div>
-                      <div className="text-xs text-muted-foreground">{material?.supplier || '---'}</div>
-                    </TableCell>
                     <TableCell className="text-sm">
                       <div>{new Date(test.startDate).toLocaleDateString('pt-BR')}</div>
-                      <div className="text-muted-foreground">até {test.endDate ? new Date(test.endDate).toLocaleDateString('pt-BR') : '---'}</div>
+                      <div className="text-xs text-muted-foreground">{test.endDate ? new Date(test.endDate).toLocaleDateString('pt-BR') : '---'}</div>
                     </TableCell>
-                    <TableCell className={`text-right font-medium ${isApproved ? 'text-success' : 'text-destructive'}`}>
-                      {achieved.toLocaleString()} km
+                    <TableCell className="text-right text-muted-foreground text-sm">
+                      {test.startKm.toLocaleString()}
                     </TableCell>
-                    <TableCell className="text-right text-muted-foreground">
-                      {expected.toLocaleString()} km
+                    <TableCell className="text-right text-muted-foreground text-sm">
+                      {(test.finalKm || 0).toLocaleString()}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className={`font-semibold ${isApproved ? 'text-success' : 'text-destructive'}`}>
+                        {achieved.toLocaleString()} km
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Alvo: {expected.toLocaleString()} km
+                      </div>
                     </TableCell>
                   </TableRow>
                 )

@@ -9,6 +9,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { AddMaterialDialog } from './components/AddMaterialDialog'
+import { FilterBar } from '@/components/FilterBar'
 
 export default function InventoryPage() {
   const { filteredMaterials } = useAppStore()
@@ -25,6 +26,8 @@ export default function InventoryPage() {
         <AddMaterialDialog />
       </div>
 
+      <FilterBar hideDate />
+
       <Card className="border-border/50 shadow-subtle">
         <CardHeader className="py-4">
           <CardTitle className="text-lg">Materiais Disponíveis</CardTitle>
@@ -33,9 +36,9 @@ export default function InventoryPage() {
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
-                <TableHead>Peça</TableHead>
-                <TableHead>Fornecedor</TableHead>
-                <TableHead>Part Number</TableHead>
+                <TableHead>Descrição (Peça)</TableHead>
+                <TableHead>Marca / Fornecedor</TableHead>
+                <TableHead>Código (PN)</TableHead>
                 <TableHead className="text-right">KM Esperado</TableHead>
                 <TableHead className="text-right">Qtd.</TableHead>
                 <TableHead className="text-center">Filial</TableHead>

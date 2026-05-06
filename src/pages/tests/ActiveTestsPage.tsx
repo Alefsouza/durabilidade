@@ -10,6 +10,7 @@ import { UpdateKmDialog } from './components/UpdateKmDialog'
 import { TestRecord } from '@/types'
 import { MoreHorizontal, Flag, RefreshCw } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { FilterBar } from '@/components/FilterBar'
 
 export default function ActiveTestsPage() {
   const { filteredTests, filteredMaterials } = useAppStore()
@@ -49,6 +50,8 @@ export default function ActiveTestsPage() {
         </div>
         <StartTestDialog />
       </div>
+      
+      <FilterBar />
 
       <Card className="border-border/50 shadow-subtle">
         <CardHeader className="py-4">
@@ -59,9 +62,10 @@ export default function ActiveTestsPage() {
             <TableHeader className="bg-muted/50">
               <TableRow>
                 <TableHead>Veículo / Posição</TableHead>
-                <TableHead>Peça (Fornecedor)</TableHead>
+                <TableHead>Item (Código / Marca)</TableHead>
                 <TableHead>Data Início</TableHead>
-                <TableHead className="w-[200px]">Progresso KM</TableHead>
+                <TableHead className="text-right">KM Inicial</TableHead>
+                <TableHead className="w-[200px]">Progresso (Alvo: Esperado)</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -80,10 +84,13 @@ export default function ActiveTestsPage() {
                     </TableCell>
                     <TableCell>
                       <div className="font-medium">{material?.name || '---'}</div>
-                      <div className="text-xs text-muted-foreground">{material?.supplier || '---'} (PN: {material?.partNumber})</div>
+                      <div className="text-xs text-muted-foreground">{material?.partNumber} / {material?.supplier}</div>
                     </TableCell>
                     <TableCell className="text-sm">
                       {new Date(test.startDate).toLocaleDateString('pt-BR')}
+                    </TableCell>
+                    <TableCell className="text-right text-muted-foreground text-sm">
+                      {test.startKm.toLocaleString()}
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-col gap-1.5 mt-1">

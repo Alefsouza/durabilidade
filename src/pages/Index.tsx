@@ -20,7 +20,8 @@ import {
   LineChart,
   YAxis,
 } from 'recharts'
-import { Activity, CheckCircle2, DollarSign, PackageOpen } from 'lucide-react'
+import { Activity, CheckCircle2, DollarSign, PackageOpen, XCircle } from 'lucide-react'
+import { FilterBar } from '@/components/FilterBar'
 
 export default function Index() {
   const { filteredTests, filteredMaterials } = useAppStore()
@@ -28,12 +29,9 @@ export default function Index() {
   const totalTests = filteredTests.length
   const finishedTests = filteredTests.filter((t) => t.status !== 'ativo')
   const approvedTests = finishedTests.filter((t) => t.status === 'aprovado')
-  const approvalRate =
-    finishedTests.length > 0 ? Math.round((approvedTests.length / finishedTests.length) * 100) : 0
-  const activeTestsCount = filteredTests.filter((t) => t.status === 'ativo').length
+  const reprovedTests = finishedTests.filter((t) => t.status === 'reprovado')
 
-  // Estimate savings: just a mock logic using quantity of approved items * 500 BRL
-  const estimatedSavings = approvedTests.length * 500
+  const activeTestsCount = filteredTests.filter((t) => t.status === 'ativo').length
 
   // Chart Data prep
   const pieData = [
@@ -46,28 +44,28 @@ export default function Index() {
     { name: 'Em Curso', value: activeTestsCount, color: 'var(--color-warning)' },
   ]
 
-  // Mocked monthly trend data
-  const trendData = [
-    { month: 'Out', aprovado: 2, reprovado: 1 },
-    { month: 'Nov', aprovado: 3, reprovado: 0 },
-    { month: 'Dez', aprovado: 5, reprovado: 2 },
-    { month: 'Jan', aprovado: 4, reprovado: 1 },
-    {
-      month: 'Fev',
-      aprovado: approvedTests.length,
-      reprovado: finishedTests.length - approvedTests.length,
-    },
-  ]
+  // Branch analysis data
+  const branches = ['SP', 'RJ', 'MG', 'RS']
+  const branchData = branches.map((branch) => {
+    const branchFinished = finishedTests.filter((t) => t.branch === branch)
+    return {
+      branch,
+      aprovado: branchFinished.filter((t) => t.status === 'aprovado').length,
+      reprovado: branchFinished.filter((t) => t.status === 'reprovado').length,
+    }
+  })
 
   const getMaterialName = (id: string) =>
     filteredMaterials.find((m) => m.id === id)?.name || 'Desconhecido'
 
   return (
     <div className="space-y-6">
-      <div>
+      <div className="flex flex-col gap-2">
         <h2 className="text-2xl font-bold tracking-tight">Dashboard de Durabilidade</h2>
         <p className="text-muted-foreground">Acompanhe o desempenho das peças em teste.</p>
       </div>
+
+      <FilterBar />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="border-border/50 shadow-subtle">
@@ -82,12 +80,22 @@ export default function Index() {
         </Card>
         <Card className="border-border/50 shadow-subtle">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium">Taxa de Aprovação</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Aprovados</CardTitle>
             <CheckCircle2 className="h-4 w-4 text-success" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{approvalRate}%</div>
-            <p className="text-xs text-muted-foreground">Testes finalizados</p>
+            <div className="text-2xl font-bold">{approvedTests.length}</div>
+            <p className="text-xs text-muted-foreground">Testes com sucesso</p>
+          </CardContent>
+        </Card>
+        <Card className="border-border/50 shadow-subtle">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-medium">Total Reprovados</CardTitle>
+            <XCircle className="h-4 w-4 text-destructive" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{reprovedTests.length}</div>
+            <p className="text-xs text-muted-foreground">Testes que falharam</p>
           </CardContent>
         </Card>
         <Card className="border-border/50 shadow-subtle">
@@ -100,22 +108,12 @@ export default function Index() {
             <p className="text-xs text-muted-foreground">Rodando atualmente</p>
           </CardContent>
         </Card>
-        <Card className="border-border/50 shadow-subtle">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium">Econ. Estimada</CardTitle>
-            <DollarSign className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">R$ {estimatedSavings.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">Baseado em itens aprovados</p>
-          </CardContent>
-        </Card>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4 border-border/50 shadow-subtle">
           <CardHeader>
-            <CardTitle>Evolução de Testes (Últimos 5 meses)</CardTitle>
+            <CardTitle>Análise por Filial</CardTitle>
           </CardHeader>
           <CardContent className="pl-0">
             <ChartContainer
@@ -125,9 +123,9 @@ export default function Index() {
               }}
               className="h-[300px] w-full"
             >
-              <BarChart data={trendData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
+              <BarChart data={branchData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
                 <CartesianGrid vertical={false} />
-                <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} />
+                <XAxis dataKey="branch" tickLine={false} tickMargin={10} axisLine={false} />
                 <YAxis tickLine={false} axisLine={false} tickMargin={10} />
                 <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
                 <ChartLegend content={<ChartLegendContent />} />
