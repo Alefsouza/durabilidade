@@ -64,23 +64,19 @@ export function PerformanceTable() {
               const diffPercent = kmEsperado > 0 ? diffKm / kmEsperado : 0
 
               const isApproved = kmRodado >= kmEsperado
-              const cellIndicatorClass = isApproved
-                ? 'bg-success/15 text-success-foreground'
-                : 'bg-destructive/15 text-destructive-foreground'
+              const rowClass = isApproved
+                ? 'bg-success text-success-foreground hover:bg-success/90'
+                : 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
 
               return (
-                <TableRow key={test.id}>
+                <TableRow key={test.id} className={rowClass}>
                   <TableCell className="whitespace-nowrap">{formatDate(test.startDate)}</TableCell>
-                  <TableCell className={cn('whitespace-nowrap', cellIndicatorClass)}>
-                    {formatDate(test.endDate)}
-                  </TableCell>
-                  <TableCell className={cellIndicatorClass}>{test.prefix}</TableCell>
-                  <TableCell className={cellIndicatorClass}>{test.position}</TableCell>
-                  <TableCell className={cellIndicatorClass}>{material?.partNumber}</TableCell>
-                  <TableCell className={cellIndicatorClass}>{material?.supplier}</TableCell>
-                  <TableCell className={cn('font-medium', cellIndicatorClass)}>
-                    {material?.name}
-                  </TableCell>
+                  <TableCell className="whitespace-nowrap">{formatDate(test.endDate)}</TableCell>
+                  <TableCell>{test.prefix}</TableCell>
+                  <TableCell>{test.position}</TableCell>
+                  <TableCell>{material?.partNumber}</TableCell>
+                  <TableCell>{material?.supplier}</TableCell>
+                  <TableCell className="font-medium">{material?.name}</TableCell>
                   <TableCell className="text-right">{kmInicial}</TableCell>
                   <TableCell className="text-right">{kmFinal}</TableCell>
                   <TableCell className="text-right">{kmRodado}</TableCell>
@@ -89,13 +85,13 @@ export function PerformanceTable() {
                   <TableCell className="text-right">{formatPercentage(diffPercent)}</TableCell>
                   <TableCell className="whitespace-nowrap">
                     {isApproved ? (
-                      <span className="flex items-center gap-2 text-success">
-                        <span className="h-2.5 w-2.5 rounded-full bg-success"></span>
+                      <span className="flex items-center gap-2 font-medium">
+                        <span className="h-2.5 w-2.5 rounded-full bg-current"></span>
                         Aprovado
                       </span>
                     ) : (
-                      <span className="flex items-center gap-2 text-destructive">
-                        <span className="h-2.5 w-2.5 rounded-full bg-destructive"></span>
+                      <span className="flex items-center gap-2 font-medium">
+                        <span className="h-2.5 w-2.5 rounded-full bg-current"></span>
                         Reprovado (Abaixo da Meta)
                       </span>
                     )}
