@@ -76,7 +76,7 @@ export function FilterBar({ hideDate = false }: { hideDate?: boolean }) {
 
   return (
     <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center bg-card p-4 rounded-lg border shadow-sm">
-      <div className="flex items-center gap-2 mt-2 lg:mt-0">
+      <div className="flex items-center gap-2">
         <Filter className="h-4 w-4 text-muted-foreground" />
         <span className="text-sm font-medium">Filtros:</span>
       </div>
@@ -138,7 +138,7 @@ export function FilterBar({ hideDate = false }: { hideDate?: boolean }) {
               <label className="text-xs text-muted-foreground">Data Inicial</label>
               <Input
                 type="date"
-                className="h-9 w-[130px]"
+                className="h-9 w-[150px]"
                 value={from}
                 onChange={(e) => setFrom(e.target.value)}
               />
@@ -147,7 +147,7 @@ export function FilterBar({ hideDate = false }: { hideDate?: boolean }) {
               <label className="text-xs text-muted-foreground">Data Final</label>
               <Input
                 type="date"
-                className="h-9 w-[130px]"
+                className="h-9 w-[150px]"
                 value={to}
                 onChange={(e) => setTo(e.target.value)}
               />
