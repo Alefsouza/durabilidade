@@ -18,6 +18,15 @@ interface AppContextType {
 
 const mockMaterials: Material[] = [
   {
+    id: 'm4',
+    name: 'Alternador ar cond.140amp O500UDA (TESTE/GARANTIA)',
+    supplier: 'Winner',
+    partNumber: '00101501',
+    expectedKm: 80000,
+    quantity: 10,
+    branch: 'SP',
+  },
+  {
     id: 'm1',
     name: 'Pastilha de Freio Dianteira',
     supplier: 'BrakeTech',
@@ -47,6 +56,18 @@ const mockMaterials: Material[] = [
 ]
 
 const mockTests: TestRecord[] = [
+  {
+    id: 't6',
+    materialId: 'm4',
+    prefix: '0052147',
+    position: 'Neutra',
+    startDate: '2025-11-28',
+    startKm: 503240,
+    finalKm: 504314,
+    endDate: '2025-12-06',
+    status: 'reprovado',
+    branch: 'SP',
+  },
   {
     id: 't1',
     materialId: 'm1',
