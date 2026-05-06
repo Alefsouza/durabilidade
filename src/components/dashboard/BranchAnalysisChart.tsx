@@ -8,7 +8,7 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from '@/components/ui/chart'
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts'
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, LabelList } from 'recharts'
 
 export function BranchAnalysisChart() {
   const { filteredTests } = useAppStore()
@@ -51,13 +51,25 @@ export function BranchAnalysisChart() {
               fill="var(--color-aprovado)"
               radius={[4, 4, 0, 0]}
               maxBarSize={40}
-            />
+            >
+              <LabelList
+                dataKey="aprovado"
+                position="top"
+                className="fill-foreground opacity-80 text-xs font-medium"
+              />
+            </Bar>
             <Bar
               dataKey="reprovado"
               fill="var(--color-reprovado)"
               radius={[4, 4, 0, 0]}
               maxBarSize={40}
-            />
+            >
+              <LabelList
+                dataKey="reprovado"
+                position="top"
+                className="fill-foreground opacity-80 text-xs font-medium"
+              />
+            </Bar>
           </BarChart>
         </ChartContainer>
       </CardContent>

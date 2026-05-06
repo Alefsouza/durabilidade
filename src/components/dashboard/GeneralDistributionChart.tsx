@@ -54,6 +54,27 @@ export function GeneralDistributionChart() {
               dataKey="value"
               nameKey="name"
               stroke="none"
+              label={({ cx, cy, midAngle, outerRadius, value, percent }) => {
+                if (value === 0) return null
+                const RADIAN = Math.PI / 180
+                const radius = outerRadius + 20
+                const x = cx + radius * Math.cos(-midAngle * RADIAN)
+                const y = cy + radius * Math.sin(-midAngle * RADIAN)
+
+                return (
+                  <text
+                    x={x}
+                    y={y}
+                    fill="currentColor"
+                    textAnchor={x > cx ? 'start' : 'end'}
+                    dominantBaseline="central"
+                    className="text-xs font-medium fill-foreground opacity-80"
+                  >
+                    {value} ({(percent * 100).toFixed(0)}%)
+                  </text>
+                )
+              }}
+              labelLine={false}
             >
               {pieData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.fill} />
