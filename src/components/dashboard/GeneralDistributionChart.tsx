@@ -67,7 +67,7 @@ export function GeneralDistributionChart() {
                     dominantBaseline="central"
                     className="text-xs font-medium fill-foreground opacity-80"
                   >
-                    Qtd: {value} ({(percent * 100).toFixed(1)}%)
+                    {value} ({(percent * 100).toFixed(1)}%)
                   </text>
                 )
               }}
