@@ -63,10 +63,14 @@ export function PerformanceTable() {
               const diffKm = kmRodado - kmEsperado
               const diffPercent = kmEsperado > 0 ? diffKm / kmEsperado : 0
 
-              const isApproved = kmRodado >= kmEsperado
-              const rowClass = isApproved
-                ? 'bg-success text-success-foreground hover:bg-success/90'
-                : 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
+              let rowClass = ''
+              if (test.status === 'aprovado') {
+                rowClass = 'bg-success text-success-foreground hover:bg-success/90'
+              } else if (test.status === 'reprovado') {
+                rowClass = 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
+              } else {
+                rowClass = 'bg-[#FEF9C3] text-yellow-900 hover:bg-[#FEF9C3]/90'
+              }
 
               return (
                 <TableRow key={test.id} className={rowClass}>
@@ -84,15 +88,20 @@ export function PerformanceTable() {
                   <TableCell className="text-right">{diffKm}</TableCell>
                   <TableCell className="text-right">{formatPercentage(diffPercent)}</TableCell>
                   <TableCell className="whitespace-nowrap">
-                    {isApproved ? (
+                    {test.status === 'aprovado' ? (
                       <span className="flex items-center gap-2 font-medium">
                         <span className="h-2.5 w-2.5 rounded-full bg-current"></span>
                         Aprovado
                       </span>
+                    ) : test.status === 'reprovado' ? (
+                      <span className="flex items-center gap-2 font-medium">
+                        <span className="h-2.5 w-2.5 rounded-full bg-current"></span>
+                        Reprovado
+                      </span>
                     ) : (
                       <span className="flex items-center gap-2 font-medium">
                         <span className="h-2.5 w-2.5 rounded-full bg-current"></span>
-                        Reprovado (Abaixo da Meta)
+                        Em teste
                       </span>
                     )}
                   </TableCell>

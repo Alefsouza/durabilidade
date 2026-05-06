@@ -14,7 +14,10 @@ export function BrandPerformanceChart() {
   const { filteredTests, materials } = useAppStore()
 
   const chartData = useMemo(() => {
-    const brandMap = new Map<string, { brand: string; aprovado: number; reprovado: number }>()
+    const brandMap = new Map<
+      string,
+      { brand: string; aprovado: number; reprovado: number; emTeste: number }
+    >()
 
     filteredTests.forEach((test) => {
       const material = materials.find((m) => m.id === test.materialId)
@@ -22,19 +25,16 @@ export function BrandPerformanceChart() {
       const brand = material.supplier || 'Desconhecida'
 
       if (!brandMap.has(brand)) {
-        brandMap.set(brand, { brand, aprovado: 0, reprovado: 0 })
+        brandMap.set(brand, { brand, aprovado: 0, reprovado: 0, emTeste: 0 })
       }
 
-      const kmInicial = test.startKm
-      const kmFinal = test.finalKm ?? test.currentKm ?? test.startKm
-      const kmRodado = kmFinal - kmInicial
-      const kmEsperado = material.expectedKm ?? 0
-
       const stats = brandMap.get(brand)!
-      if (kmRodado >= kmEsperado) {
+      if (test.status === 'aprovado') {
         stats.aprovado += 1
-      } else {
+      } else if (test.status === 'reprovado') {
         stats.reprovado += 1
+      } else if (test.status === 'ativo') {
+        stats.emTeste += 1
       }
     })
 
@@ -51,6 +51,7 @@ export function BrandPerformanceChart() {
           config={{
             aprovado: { label: 'Aprovados', color: 'hsl(var(--success))' },
             reprovado: { label: 'Reprovados', color: 'hsl(var(--destructive))' },
+            emTeste: { label: 'Em teste', color: '#FEF9C3' },
           }}
           className="min-h-[300px] w-full"
         >
@@ -80,6 +81,18 @@ export function BrandPerformanceChart() {
             >
               <LabelList
                 dataKey="reprovado"
+                position="top"
+                className="fill-foreground opacity-80 text-xs font-medium"
+              />
+            </Bar>
+            <Bar
+              dataKey="emTeste"
+              fill="var(--color-emTeste)"
+              radius={[4, 4, 0, 0]}
+              maxBarSize={40}
+            >
+              <LabelList
+                dataKey="emTeste"
                 position="top"
                 className="fill-foreground opacity-80 text-xs font-medium"
               />

@@ -59,7 +59,7 @@ export default function Index() {
         <Card className="border-border/50 shadow-subtle">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium">Peças em Teste</CardTitle>
-            <Activity className="h-4 w-4 text-warning" />
+            <Activity className="h-4 w-4 text-[#eab308]" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{activeTestsCount}</div>

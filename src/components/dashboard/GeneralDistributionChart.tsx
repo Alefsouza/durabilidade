@@ -18,14 +18,12 @@ export function GeneralDistributionChart() {
     const approvedTests = finishedTests.filter((t) => t.status === 'aprovado')
     const activeTestsCount = filteredTests.filter((t) => t.status === 'ativo').length
 
+    const reprovedTests = finishedTests.filter((t) => t.status === 'reprovado')
+
     return [
       { name: 'Aprovado', value: approvedTests.length, fill: 'var(--color-Aprovado)' },
-      {
-        name: 'Reprovado',
-        value: finishedTests.length - approvedTests.length,
-        fill: 'var(--color-Reprovado)',
-      },
-      { name: 'Em andamento', value: activeTestsCount, fill: 'var(--color-Em-andamento)' },
+      { name: 'Reprovado', value: reprovedTests.length, fill: 'var(--color-Reprovado)' },
+      { name: 'Em teste', value: activeTestsCount, fill: 'var(--color-Em-teste)' },
     ]
   }, [filteredTests])
 
@@ -34,14 +32,14 @@ export function GeneralDistributionChart() {
       <CardHeader>
         <CardTitle>Distribuição Geral</CardTitle>
       </CardHeader>
-      <CardContent className="flex justify-center">
+      <CardContent className="flex justify-center overflow-visible">
         <ChartContainer
           config={{
             Aprovado: { label: 'Aprovado', color: 'hsl(var(--success))' },
             Reprovado: { label: 'Reprovado', color: 'hsl(var(--destructive))' },
-            'Em-andamento': { label: 'Em andamento', color: '#FEF9C3' },
+            'Em-teste': { label: 'Em teste', color: '#FEF9C3' },
           }}
-          className="h-[300px] w-full max-w-[300px]"
+          className="h-[300px] w-full max-w-[350px]"
         >
           <PieChart>
             <Pie
@@ -70,7 +68,7 @@ export function GeneralDistributionChart() {
                     dominantBaseline="central"
                     className="text-xs font-medium fill-foreground opacity-80"
                   >
-                    {value} ({(percent * 100).toFixed(0)}%)
+                    {value} ({(percent * 100).toFixed(1)}%)
                   </text>
                 )
               }}

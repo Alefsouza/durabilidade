@@ -18,11 +18,12 @@ export function BranchAnalysisChart() {
     const finishedTests = filteredTests.filter((t) => t.status !== 'ativo')
 
     return branches.map((branch) => {
-      const branchFinished = finishedTests.filter((t) => t.branch === branch)
+      const branchTests = filteredTests.filter((t) => t.branch === branch)
       return {
         branch,
-        aprovado: branchFinished.filter((t) => t.status === 'aprovado').length,
-        reprovado: branchFinished.filter((t) => t.status === 'reprovado').length,
+        aprovado: branchTests.filter((t) => t.status === 'aprovado').length,
+        reprovado: branchTests.filter((t) => t.status === 'reprovado').length,
+        emTeste: branchTests.filter((t) => t.status === 'ativo').length,
       }
     })
   }, [filteredTests])
@@ -37,6 +38,7 @@ export function BranchAnalysisChart() {
           config={{
             aprovado: { label: 'Aprovados', color: 'hsl(var(--success))' },
             reprovado: { label: 'Reprovados', color: 'hsl(var(--destructive))' },
+            emTeste: { label: 'Em teste', color: '#FEF9C3' },
           }}
           className="h-[300px] w-full"
         >
@@ -66,6 +68,18 @@ export function BranchAnalysisChart() {
             >
               <LabelList
                 dataKey="reprovado"
+                position="top"
+                className="fill-foreground opacity-80 text-xs font-medium"
+              />
+            </Bar>
+            <Bar
+              dataKey="emTeste"
+              fill="var(--color-emTeste)"
+              radius={[4, 4, 0, 0]}
+              maxBarSize={40}
+            >
+              <LabelList
+                dataKey="emTeste"
                 position="top"
                 className="fill-foreground opacity-80 text-xs font-medium"
               />
