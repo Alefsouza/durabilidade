@@ -6,6 +6,7 @@ import { PerformanceTable } from '@/components/dashboard/PerformanceTable'
 import { BrandPerformanceChart } from '@/components/dashboard/BrandPerformanceChart'
 import { BranchAnalysisChart } from '@/components/dashboard/BranchAnalysisChart'
 import { GeneralDistributionChart } from '@/components/dashboard/GeneralDistributionChart'
+import { TestEvolutionChart } from '@/components/dashboard/TestEvolutionChart'
 
 export default function Index() {
   const { filteredTests } = useDashboardData()
@@ -75,6 +76,7 @@ export default function Index() {
         </div>
         <div className="flex flex-col gap-4">
           <GeneralDistributionChart />
+          <TestEvolutionChart />
         </div>
       </div>
 
