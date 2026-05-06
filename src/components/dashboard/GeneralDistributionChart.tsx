@@ -19,13 +19,13 @@ export function GeneralDistributionChart() {
     const activeTestsCount = filteredTests.filter((t) => t.status === 'ativo').length
 
     return [
-      { name: 'Aprovado', value: approvedTests.length, color: 'var(--color-success)' },
+      { name: 'Aprovado', value: approvedTests.length, color: '#166534' },
       {
         name: 'Reprovado',
         value: finishedTests.length - approvedTests.length,
-        color: 'var(--color-destructive)',
+        color: '#991b1b',
       },
-      { name: 'Em Curso', value: activeTestsCount, color: 'var(--color-warning)' },
+      { name: 'Em andamento', value: activeTestsCount, color: '#FEF9C3' },
     ]
   }, [filteredTests])
 
@@ -37,9 +37,9 @@ export function GeneralDistributionChart() {
       <CardContent className="flex justify-center">
         <ChartContainer
           config={{
-            Aprovado: { label: 'Aprovado', color: 'hsl(var(--success))' },
-            Reprovado: { label: 'Reprovado', color: 'hsl(var(--destructive))' },
-            'Em Curso': { label: 'Em Curso', color: 'hsl(var(--warning))' },
+            Aprovado: { label: 'Aprovado', color: '#166534' },
+            Reprovado: { label: 'Reprovado', color: '#991b1b' },
+            'Em andamento': { label: 'Em andamento', color: '#FEF9C3' },
           }}
           className="h-[300px] w-full max-w-[300px]"
         >
@@ -52,6 +52,7 @@ export function GeneralDistributionChart() {
               outerRadius={80}
               paddingAngle={5}
               dataKey="value"
+              stroke="none"
             >
               {pieData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
