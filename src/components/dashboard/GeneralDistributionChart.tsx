@@ -17,13 +17,12 @@ export function GeneralDistributionChart() {
     const finishedTests = filteredTests.filter((t) => t.status !== 'ativo')
     const approvedTests = finishedTests.filter((t) => t.status === 'aprovado')
     const activeTestsCount = filteredTests.filter((t) => t.status === 'ativo').length
-
     const reprovedTests = finishedTests.filter((t) => t.status === 'reprovado')
 
     return [
-      { name: 'Aprovado', value: approvedTests.length, fill: 'var(--color-Aprovado)' },
-      { name: 'Reprovado', value: reprovedTests.length, fill: 'var(--color-Reprovado)' },
-      { name: 'Em teste', value: activeTestsCount, fill: 'var(--color-Em-teste)' },
+      { name: 'aprovado', value: approvedTests.length, fill: 'var(--color-aprovado)' },
+      { name: 'reprovado', value: reprovedTests.length, fill: 'var(--color-reprovado)' },
+      { name: 'emTeste', value: activeTestsCount, fill: 'var(--color-emTeste)' },
     ].filter((item) => item.value > 0)
   }, [filteredTests])
 
@@ -35,9 +34,9 @@ export function GeneralDistributionChart() {
       <CardContent className="flex justify-center overflow-visible">
         <ChartContainer
           config={{
-            Aprovado: { label: 'Aprovado', color: 'hsl(var(--success))' },
-            Reprovado: { label: 'Reprovado', color: 'hsl(var(--destructive))' },
-            'Em-teste': { label: 'Em teste', color: '#FEF9C3' },
+            aprovado: { label: 'Aprovados', color: 'hsl(var(--success))' },
+            reprovado: { label: 'Reprovados', color: 'hsl(var(--destructive))' },
+            emTeste: { label: 'Em teste', color: '#FEF9C3' },
           }}
           className="h-[300px] w-full max-w-[350px]"
         >
@@ -68,7 +67,7 @@ export function GeneralDistributionChart() {
                     dominantBaseline="central"
                     className="text-xs font-medium fill-foreground opacity-80"
                   >
-                    {value} ({(percent * 100).toFixed(1)}%)
+                    Qtd: {value} ({(percent * 100).toFixed(1)}%)
                   </text>
                 )
               }}

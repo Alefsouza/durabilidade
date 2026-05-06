@@ -41,15 +41,19 @@ export function BrandPerformanceChart() {
     return Array.from(brandMap.values())
       .map((stat) => ({
         brand: stat.brand,
-        aprovado: stat.aprovado || undefined,
-        reprovado: stat.reprovado || undefined,
-        emTeste: stat.emTeste || undefined,
+        aprovado: stat.aprovado > 0 ? stat.aprovado : undefined,
+        reprovado: stat.reprovado > 0 ? stat.reprovado : undefined,
+        emTeste: stat.emTeste > 0 ? stat.emTeste : undefined,
       }))
       .filter(
         (data) =>
           data.aprovado !== undefined || data.reprovado !== undefined || data.emTeste !== undefined,
       )
   }, [filteredTests, materials])
+
+  const hasAprovado = chartData.some((d) => d.aprovado !== undefined)
+  const hasReprovado = chartData.some((d) => d.reprovado !== undefined)
+  const hasEmTeste = chartData.some((d) => d.emTeste !== undefined)
 
   return (
     <Card className="border-border/50 shadow-subtle flex flex-col">
@@ -71,45 +75,51 @@ export function BrandPerformanceChart() {
             <YAxis tickLine={false} axisLine={false} tickMargin={10} />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <ChartLegend content={<ChartLegendContent />} />
-            <Bar
-              dataKey="aprovado"
-              fill="var(--color-aprovado)"
-              radius={[4, 4, 0, 0]}
-              maxBarSize={40}
-            >
-              <LabelList
+            {hasAprovado && (
+              <Bar
                 dataKey="aprovado"
-                position="top"
-                className="fill-foreground opacity-80 text-xs font-medium"
-                formatter={(value: number) => (value > 0 ? value : '')}
-              />
-            </Bar>
-            <Bar
-              dataKey="reprovado"
-              fill="var(--color-reprovado)"
-              radius={[4, 4, 0, 0]}
-              maxBarSize={40}
-            >
-              <LabelList
+                fill="var(--color-aprovado)"
+                radius={[4, 4, 0, 0]}
+                maxBarSize={40}
+              >
+                <LabelList
+                  dataKey="aprovado"
+                  position="top"
+                  className="fill-foreground opacity-80 text-xs font-medium"
+                  formatter={(value: number) => (value > 0 ? value : '')}
+                />
+              </Bar>
+            )}
+            {hasReprovado && (
+              <Bar
                 dataKey="reprovado"
-                position="top"
-                className="fill-foreground opacity-80 text-xs font-medium"
-                formatter={(value: number) => (value > 0 ? value : '')}
-              />
-            </Bar>
-            <Bar
-              dataKey="emTeste"
-              fill="var(--color-emTeste)"
-              radius={[4, 4, 0, 0]}
-              maxBarSize={40}
-            >
-              <LabelList
+                fill="var(--color-reprovado)"
+                radius={[4, 4, 0, 0]}
+                maxBarSize={40}
+              >
+                <LabelList
+                  dataKey="reprovado"
+                  position="top"
+                  className="fill-foreground opacity-80 text-xs font-medium"
+                  formatter={(value: number) => (value > 0 ? value : '')}
+                />
+              </Bar>
+            )}
+            {hasEmTeste && (
+              <Bar
                 dataKey="emTeste"
-                position="top"
-                className="fill-foreground opacity-80 text-xs font-medium"
-                formatter={(value: number) => (value > 0 ? value : '')}
-              />
-            </Bar>
+                fill="var(--color-emTeste)"
+                radius={[4, 4, 0, 0]}
+                maxBarSize={40}
+              >
+                <LabelList
+                  dataKey="emTeste"
+                  position="top"
+                  className="fill-foreground opacity-80 text-xs font-medium"
+                  formatter={(value: number) => (value > 0 ? value : '')}
+                />
+              </Bar>
+            )}
           </BarChart>
         </ChartContainer>
       </CardContent>
