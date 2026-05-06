@@ -41,7 +41,7 @@ export function TestEvolutionChart() {
       <CardContent>
         <ChartContainer
           config={{
-            testes: { label: 'Testes Iniciados', color: 'hsl(var(--primary))' },
+            testes: { label: 'Testes Iniciados', color: '#6b7280' },
           }}
           className="h-[300px] w-full"
         >
