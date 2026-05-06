@@ -6,6 +6,10 @@ interface AppContextType {
   setCurrentBranch: (branch: Branch) => void
   dateFilter: { from: string; to: string } | null
   setDateFilter: (range: { from: string; to: string } | null) => void
+  prefixFilter: string
+  setPrefixFilter: (prefix: string) => void
+  brandFilter: string
+  setBrandFilter: (brand: string) => void
   materials: Material[]
   addMaterial: (material: Omit<Material, 'id'>) => void
   tests: TestRecord[]
@@ -133,6 +137,8 @@ const AppContext = createContext<AppContextType | null>(null)
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [currentBranch, setCurrentBranch] = useState<Branch>('Todas')
   const [dateFilter, setDateFilter] = useState<{ from: string; to: string } | null>(null)
+  const [prefixFilter, setPrefixFilter] = useState<string>('Todos')
+  const [brandFilter, setBrandFilter] = useState<string>('Todas')
   const [materials, setMaterials] = useState<Material[]>(mockMaterials)
   const [tests, setTests] = useState<TestRecord[]>(mockTests)
 
@@ -184,13 +190,29 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }
 
   const filteredMaterials = useMemo(() => {
-    return currentBranch === 'Todas'
-      ? materials
-      : materials.filter((m) => m.branch === currentBranch)
-  }, [materials, currentBranch])
+    let result =
+      currentBranch === 'Todas' ? materials : materials.filter((m) => m.branch === currentBranch)
+
+    if (brandFilter !== 'Todas') {
+      result = result.filter((m) => m.supplier === brandFilter)
+    }
+    return result
+  }, [materials, currentBranch, brandFilter])
 
   const filteredTests = useMemo(() => {
     let result = currentBranch === 'Todas' ? tests : tests.filter((t) => t.branch === currentBranch)
+
+    if (prefixFilter !== 'Todos') {
+      result = result.filter((t) => t.prefix === prefixFilter)
+    }
+
+    if (brandFilter !== 'Todas') {
+      result = result.filter((t) => {
+        const material = materials.find((m) => m.id === t.materialId)
+        return material?.supplier === brandFilter
+      })
+    }
+
     if (dateFilter) {
       const fromTime = new Date(dateFilter.from).getTime()
       // Adjust to end of day to include the full 'to' date
@@ -204,13 +226,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       })
     }
     return result
-  }, [tests, currentBranch, dateFilter])
+  }, [tests, currentBranch, dateFilter, prefixFilter, brandFilter, materials])
 
   const value = {
     currentBranch,
     setCurrentBranch,
     dateFilter,
     setDateFilter,
+    prefixFilter,
+    setPrefixFilter,
+    brandFilter,
+    setBrandFilter,
     materials,
     addMaterial,
     tests,
