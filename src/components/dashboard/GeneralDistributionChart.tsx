@@ -19,13 +19,13 @@ export function GeneralDistributionChart() {
     const activeTestsCount = filteredTests.filter((t) => t.status === 'ativo').length
 
     return [
-      { name: 'Aprovado', value: approvedTests.length, color: '#166534' },
+      { name: 'Aprovado', value: approvedTests.length, fill: 'var(--color-Aprovado)' },
       {
         name: 'Reprovado',
         value: finishedTests.length - approvedTests.length,
-        color: '#991b1b',
+        fill: 'var(--color-Reprovado)',
       },
-      { name: 'Em andamento', value: activeTestsCount, color: '#FEF9C3' },
+      { name: 'Em andamento', value: activeTestsCount, fill: 'var(--color-Em-andamento)' },
     ]
   }, [filteredTests])
 
@@ -37,9 +37,9 @@ export function GeneralDistributionChart() {
       <CardContent className="flex justify-center">
         <ChartContainer
           config={{
-            Aprovado: { label: 'Aprovado', color: '#166534' },
-            Reprovado: { label: 'Reprovado', color: '#991b1b' },
-            'Em andamento': { label: 'Em andamento', color: '#FEF9C3' },
+            Aprovado: { label: 'Aprovado', color: 'hsl(var(--success))' },
+            Reprovado: { label: 'Reprovado', color: 'hsl(var(--destructive))' },
+            'Em-andamento': { label: 'Em andamento', color: '#FEF9C3' },
           }}
           className="h-[300px] w-full max-w-[300px]"
         >
@@ -52,10 +52,11 @@ export function GeneralDistributionChart() {
               outerRadius={80}
               paddingAngle={5}
               dataKey="value"
+              nameKey="name"
               stroke="none"
             >
               {pieData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
+                <Cell key={`cell-${index}`} fill={entry.fill} />
               ))}
             </Pie>
             <ChartTooltip content={<ChartTooltipContent />} />
