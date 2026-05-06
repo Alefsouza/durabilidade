@@ -17,15 +17,20 @@ export function BranchAnalysisChart() {
     const branches = ['SP', 'RJ', 'MG', 'RS']
     const finishedTests = filteredTests.filter((t) => t.status !== 'ativo')
 
-    return branches.map((branch) => {
-      const branchTests = filteredTests.filter((t) => t.branch === branch)
-      return {
-        branch,
-        aprovado: branchTests.filter((t) => t.status === 'aprovado').length,
-        reprovado: branchTests.filter((t) => t.status === 'reprovado').length,
-        emTeste: branchTests.filter((t) => t.status === 'ativo').length,
-      }
-    })
+    return branches
+      .map((branch) => {
+        const branchTests = filteredTests.filter((t) => t.branch === branch)
+        return {
+          branch,
+          aprovado: branchTests.filter((t) => t.status === 'aprovado').length || undefined,
+          reprovado: branchTests.filter((t) => t.status === 'reprovado').length || undefined,
+          emTeste: branchTests.filter((t) => t.status === 'ativo').length || undefined,
+        }
+      })
+      .filter(
+        (data) =>
+          data.aprovado !== undefined || data.reprovado !== undefined || data.emTeste !== undefined,
+      )
   }, [filteredTests])
 
   return (
@@ -58,6 +63,7 @@ export function BranchAnalysisChart() {
                 dataKey="aprovado"
                 position="top"
                 className="fill-foreground opacity-80 text-xs font-medium"
+                formatter={(value: number) => (value > 0 ? value : '')}
               />
             </Bar>
             <Bar
@@ -70,6 +76,7 @@ export function BranchAnalysisChart() {
                 dataKey="reprovado"
                 position="top"
                 className="fill-foreground opacity-80 text-xs font-medium"
+                formatter={(value: number) => (value > 0 ? value : '')}
               />
             </Bar>
             <Bar
@@ -82,6 +89,7 @@ export function BranchAnalysisChart() {
                 dataKey="emTeste"
                 position="top"
                 className="fill-foreground opacity-80 text-xs font-medium"
+                formatter={(value: number) => (value > 0 ? value : '')}
               />
             </Bar>
           </BarChart>

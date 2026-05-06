@@ -39,6 +39,16 @@ export function BrandPerformanceChart() {
     })
 
     return Array.from(brandMap.values())
+      .map((stat) => ({
+        brand: stat.brand,
+        aprovado: stat.aprovado || undefined,
+        reprovado: stat.reprovado || undefined,
+        emTeste: stat.emTeste || undefined,
+      }))
+      .filter(
+        (data) =>
+          data.aprovado !== undefined || data.reprovado !== undefined || data.emTeste !== undefined,
+      )
   }, [filteredTests, materials])
 
   return (
@@ -71,6 +81,7 @@ export function BrandPerformanceChart() {
                 dataKey="aprovado"
                 position="top"
                 className="fill-foreground opacity-80 text-xs font-medium"
+                formatter={(value: number) => (value > 0 ? value : '')}
               />
             </Bar>
             <Bar
@@ -83,6 +94,7 @@ export function BrandPerformanceChart() {
                 dataKey="reprovado"
                 position="top"
                 className="fill-foreground opacity-80 text-xs font-medium"
+                formatter={(value: number) => (value > 0 ? value : '')}
               />
             </Bar>
             <Bar
@@ -95,6 +107,7 @@ export function BrandPerformanceChart() {
                 dataKey="emTeste"
                 position="top"
                 className="fill-foreground opacity-80 text-xs font-medium"
+                formatter={(value: number) => (value > 0 ? value : '')}
               />
             </Bar>
           </BarChart>

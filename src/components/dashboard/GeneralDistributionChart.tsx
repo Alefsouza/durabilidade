@@ -24,7 +24,7 @@ export function GeneralDistributionChart() {
       { name: 'Aprovado', value: approvedTests.length, fill: 'var(--color-Aprovado)' },
       { name: 'Reprovado', value: reprovedTests.length, fill: 'var(--color-Reprovado)' },
       { name: 'Em teste', value: activeTestsCount, fill: 'var(--color-Em-teste)' },
-    ]
+    ].filter((item) => item.value > 0)
   }, [filteredTests])
 
   return (
