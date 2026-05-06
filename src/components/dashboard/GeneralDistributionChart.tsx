@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useAppStore } from '@/store/use-app-store'
+import { useDashboardData } from '@/hooks/use-dashboard-data'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   ChartContainer,
@@ -11,7 +11,7 @@ import {
 import { Pie, PieChart, Cell } from 'recharts'
 
 export function GeneralDistributionChart() {
-  const { filteredTests } = useAppStore()
+  const { filteredTests } = useDashboardData()
 
   const pieData = useMemo(() => {
     const finishedTests = filteredTests.filter((t) => t.status !== 'ativo')

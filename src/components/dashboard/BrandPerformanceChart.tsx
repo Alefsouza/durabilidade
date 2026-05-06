@@ -1,17 +1,11 @@
 import { useMemo } from 'react'
-import { useAppStore } from '@/store/use-app-store'
+import { useDashboardData } from '@/hooks/use-dashboard-data'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  ChartLegend,
-  ChartLegendContent,
-} from '@/components/ui/chart'
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, LabelList } from 'recharts'
+import { ChartContainer, ChartTooltip } from '@/components/ui/chart'
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, LabelList, Cell } from 'recharts'
 
 export function BrandPerformanceChart() {
-  const { filteredTests, materials } = useAppStore()
+  const { filteredTests, materials } = useDashboardData()
 
   const chartData = useMemo(() => {
     const brandMap = new Map<
@@ -38,25 +32,37 @@ export function BrandPerformanceChart() {
       }
     })
 
-    return Array.from(brandMap.values())
-      .map((stat) => ({
-        brand: stat.brand,
-        aprovado: stat.aprovado > 0 ? stat.aprovado : undefined,
-        reprovado: stat.reprovado > 0 ? stat.reprovado : undefined,
-        emTeste: stat.emTeste > 0 ? stat.emTeste : undefined,
-      }))
-      .filter(
-        (data) =>
-          data.aprovado !== undefined || data.reprovado !== undefined || data.emTeste !== undefined,
-      )
+    const flatData: { brand: string; status: string; value: number; fill: string }[] = []
+
+    Array.from(brandMap.values()).forEach((stat) => {
+      if (stat.aprovado > 0)
+        flatData.push({
+          brand: stat.brand,
+          status: 'aprovado',
+          value: stat.aprovado,
+          fill: 'var(--color-aprovado)',
+        })
+      if (stat.reprovado > 0)
+        flatData.push({
+          brand: stat.brand,
+          status: 'reprovado',
+          value: stat.reprovado,
+          fill: 'var(--color-reprovado)',
+        })
+      if (stat.emTeste > 0)
+        flatData.push({
+          brand: stat.brand,
+          status: 'emTeste',
+          value: stat.emTeste,
+          fill: 'var(--color-emTeste)',
+        })
+    })
+
+    return flatData
   }, [filteredTests, materials])
 
-  const hasAprovado = chartData.some((d) => d.aprovado !== undefined)
-  const hasReprovado = chartData.some((d) => d.reprovado !== undefined)
-  const hasEmTeste = chartData.some((d) => d.emTeste !== undefined)
-
   return (
-    <Card className="border-border/50 shadow-subtle flex flex-col">
+    <Card className="border-border/50 shadow-subtle flex flex-col h-full">
       <CardHeader>
         <CardTitle>Análise por Marca</CardTitle>
       </CardHeader>
@@ -73,55 +79,57 @@ export function BrandPerformanceChart() {
             <CartesianGrid vertical={false} />
             <XAxis dataKey="brand" tickLine={false} tickMargin={10} axisLine={false} />
             <YAxis tickLine={false} axisLine={false} tickMargin={10} />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <ChartLegend content={<ChartLegendContent />} />
-            {hasAprovado && (
-              <Bar
-                dataKey="aprovado"
-                fill="var(--color-aprovado)"
-                radius={[4, 4, 0, 0]}
-                maxBarSize={40}
-              >
-                <LabelList
-                  dataKey="aprovado"
-                  position="top"
-                  className="fill-foreground opacity-80 text-xs font-medium"
-                  formatter={(value: number) => (value > 0 ? value : '')}
-                />
-              </Bar>
-            )}
-            {hasReprovado && (
-              <Bar
-                dataKey="reprovado"
-                fill="var(--color-reprovado)"
-                radius={[4, 4, 0, 0]}
-                maxBarSize={40}
-              >
-                <LabelList
-                  dataKey="reprovado"
-                  position="top"
-                  className="fill-foreground opacity-80 text-xs font-medium"
-                  formatter={(value: number) => (value > 0 ? value : '')}
-                />
-              </Bar>
-            )}
-            {hasEmTeste && (
-              <Bar
-                dataKey="emTeste"
-                fill="var(--color-emTeste)"
-                radius={[4, 4, 0, 0]}
-                maxBarSize={40}
-              >
-                <LabelList
-                  dataKey="emTeste"
-                  position="top"
-                  className="fill-foreground opacity-80 text-xs font-medium"
-                  formatter={(value: number) => (value > 0 ? value : '')}
-                />
-              </Bar>
-            )}
+
+            <ChartTooltip
+              cursor={false}
+              content={({ active, payload }) => {
+                if (!active || !payload?.length) return null
+                const data = payload[0].payload
+                const configLabel =
+                  data.status === 'aprovado'
+                    ? 'Aprovados'
+                    : data.status === 'reprovado'
+                      ? 'Reprovados'
+                      : 'Em teste'
+                return (
+                  <div className="rounded-lg border bg-background p-2 shadow-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full" style={{ background: data.fill }} />
+                      <span className="text-xs text-muted-foreground">{configLabel}</span>
+                      <span className="text-xs font-bold">{data.value}</span>
+                    </div>
+                  </div>
+                )
+              }}
+            />
+
+            <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={40}>
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.fill} />
+              ))}
+              <LabelList
+                dataKey="value"
+                position="top"
+                className="fill-foreground opacity-80 text-xs font-medium"
+              />
+            </Bar>
           </BarChart>
         </ChartContainer>
+
+        <div className="flex items-center justify-center gap-4 pt-4">
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 rounded-[2px] bg-[hsl(var(--success))]"></div>
+            <span className="text-xs text-muted-foreground">Aprovados</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 rounded-[2px] bg-[hsl(var(--destructive))]"></div>
+            <span className="text-xs text-muted-foreground">Reprovados</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 rounded-[2px] bg-[#FEF9C3]"></div>
+            <span className="text-xs text-muted-foreground">Em teste</span>
+          </div>
+        </div>
       </CardContent>
     </Card>
   )

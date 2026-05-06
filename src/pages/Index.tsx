@@ -1,4 +1,4 @@
-import { useAppStore } from '@/store/use-app-store'
+import { useDashboardData } from '@/hooks/use-dashboard-data'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Activity, CheckCircle2, PackageOpen, XCircle } from 'lucide-react'
 import { FilterBar } from '@/components/FilterBar'
@@ -8,7 +8,7 @@ import { BranchAnalysisChart } from '@/components/dashboard/BranchAnalysisChart'
 import { GeneralDistributionChart } from '@/components/dashboard/GeneralDistributionChart'
 
 export default function Index() {
-  const { filteredTests } = useAppStore()
+  const { filteredTests } = useDashboardData()
 
   const totalTests = filteredTests.length
   const finishedTests = filteredTests.filter((t) => t.status !== 'ativo')

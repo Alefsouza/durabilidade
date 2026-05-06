@@ -1,4 +1,4 @@
-import { useAppStore } from '@/store/use-app-store'
+import { useDashboardData } from '@/hooks/use-dashboard-data'
 import { cn } from '@/lib/utils'
 import {
   Table,
@@ -11,7 +11,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function PerformanceTable() {
-  const { filteredTests, materials } = useAppStore()
+  const { filteredTests, materials } = useDashboardData()
 
   const formatPercentage = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
