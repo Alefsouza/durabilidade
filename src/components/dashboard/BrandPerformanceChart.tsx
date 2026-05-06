@@ -42,17 +42,17 @@ export function BrandPerformanceChart() {
   }, [filteredTests, materials])
 
   return (
-    <Card className="border-border/50 shadow-subtle h-full">
+    <Card className="border-border/50 shadow-subtle flex flex-col">
       <CardHeader>
         <CardTitle>Análise por Marca</CardTitle>
       </CardHeader>
-      <CardContent className="pl-0">
+      <CardContent className="flex-1 pb-4 pl-0">
         <ChartContainer
           config={{
             aprovado: { label: 'Aprovados', color: 'hsl(var(--success))' },
             reprovado: { label: 'Reprovados', color: 'hsl(var(--destructive))' },
           }}
-          className="h-[300px] w-full"
+          className="min-h-[300px] w-full"
         >
           <BarChart data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
             <CartesianGrid vertical={false} />
