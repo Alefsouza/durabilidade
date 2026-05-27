@@ -1,0 +1,233 @@
+{
+  "generatedAt": "2026-05-27T17:45:46.435Z",
+  "collections": [
+    {
+      "name": "users",
+      "type": "auth",
+      "apiRules": {
+        "list": "id = @request.auth.id",
+        "view": "id = @request.auth.id",
+        "create": "",
+        "update": "id = @request.auth.id",
+        "delete": "id = @request.auth.id"
+      },
+      "fields": [
+        {
+          "name": "name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "avatar",
+          "type": "file",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX `idx_tokenKey__pb_users_auth_` ON `users` (`tokenKey`)",
+        "CREATE UNIQUE INDEX `idx_email__pb_users_auth_` ON `users` (`email`) WHERE `email` != ''"
+      ]
+    },
+    {
+      "name": "durability_tests",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "material_id",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "prefix",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "position",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "start_date",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "start_km",
+          "type": "number",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "current_km",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "final_km",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "end_date",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "ativo",
+            "aprovado",
+            "reprovado"
+          ]
+        },
+        {
+          "name": "branch",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "SP",
+            "RJ",
+            "MG",
+            "RS"
+          ]
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": []
+    },
+    {
+      "name": "materials",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "name",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "supplier",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "partNumber",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "expectedKm",
+          "type": "number",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "quantity",
+          "type": "number",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "branch",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": [
+            "SP",
+            "RJ",
+            "MG",
+            "RS",
+            "Todas"
+          ]
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate"
+          ]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
+        }
+      ],
+      "indexes": []
+    }
+  ]
+}
