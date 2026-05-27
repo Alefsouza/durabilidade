@@ -3,15 +3,24 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { FilterBar } from '@/components/FilterBar'
+import { AlertCircle, Loader2 } from 'lucide-react'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 
 export default function HistoryTestsPage() {
-  const { filteredTests, filteredMaterials } = useAppStore()
+  const { filteredTests, filteredMaterials, isLoadingMaterials, materialsError } = useAppStore()
   const historyTests = filteredTests.filter(t => t.status !== 'ativo').sort((a, b) => new Date(b.endDate || '').getTime() - new Date(a.endDate || '').getTime())
 
   const getMaterial = (id: string) => filteredMaterials.find(m => m.id === id)
 
   return (
     <div className="space-y-6">
+      {materialsError && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Erro de Sincronização</AlertTitle>
+          <AlertDescription>Não foi possível carregar os dados de materiais do Oracle: {materialsError}</AlertDescription>
+        </Alert>
+      )}
       <div>
         <h2 className="text-2xl font-bold tracking-tight">Histórico de Testes</h2>
         <p className="text-muted-foreground">Registro de todas as peças que já finalizaram o ciclo de testes.</p>
@@ -24,20 +33,26 @@ export default function HistoryTestsPage() {
           <CardTitle className="text-lg">Testes Concluídos</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader className="bg-muted/50">
-              <TableRow>
-                <TableHead>Status</TableHead>
-                <TableHead>Item / Fornecedor</TableHead>
-                <TableHead>Veículo (Prefixo)</TableHead>
-                <TableHead>Data Início - Fim</TableHead>
-                <TableHead className="text-right">KM Inicial</TableHead>
-                <TableHead className="text-right">KM Final</TableHead>
-                <TableHead className="text-right">Valid. (Total / Esperado)</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {historyTests.map((test) => {
+          {isLoadingMaterials ? (
+            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+              <Loader2 className="h-8 w-8 animate-spin mb-4" />
+              <p>Carregando dados de materiais...</p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader className="bg-muted/50">
+                <TableRow>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Item / Fornecedor</TableHead>
+                  <TableHead>Veículo (Prefixo)</TableHead>
+                  <TableHead>Data Início - Fim</TableHead>
+                  <TableHead className="text-right">KM Inicial</TableHead>
+                  <TableHead className="text-right">KM Final</TableHead>
+                  <TableHead className="text-right">Valid. (Total / Esperado)</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {historyTests.map((test) => {
                 const material = getMaterial(test.materialId)
                 const expected = material?.expectedKm || 0
                 const achieved = (test.finalKm || 0) - test.startKm
@@ -82,15 +97,16 @@ export default function HistoryTestsPage() {
                   </TableRow>
                 )
               })}
-              {historyTests.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center h-24 text-muted-foreground">
-                    Nenhum histórico encontrado para esta filial.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                {historyTests.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center h-24 text-muted-foreground">
+                      Nenhum histórico encontrado para esta filial.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useMemo } from 'react'
+import React, { createContext, useContext, useState, useMemo, useEffect } from 'react'
 import { Material, TestRecord, Branch, Status } from '@/types'
+import { getOracleInventory } from '@/services/inventory'
 
 interface AppContextType {
   currentBranch: Branch
@@ -13,6 +14,8 @@ interface AppContextType {
   materials: Material[]
   addMaterial: (material: Omit<Material, 'id'>) => void
   setMaterials: (materials: Material[]) => void
+  isLoadingMaterials: boolean
+  materialsError: string | null
   tests: TestRecord[]
   startTest: (test: Omit<TestRecord, 'id' | 'status'>) => void
   endTest: (id: string, finalKm: number, endDate: string) => void
@@ -21,49 +24,10 @@ interface AppContextType {
   filteredTests: TestRecord[]
 }
 
-const mockMaterials: Material[] = [
-  {
-    id: 'm4',
-    name: 'Alternador ar cond.140amp O500UDA (TESTE/GARANTIA)',
-    supplier: 'Winner',
-    partNumber: '00101501',
-    expectedKm: 80000,
-    quantity: 10,
-    branch: 'SP',
-  },
-  {
-    id: 'm1',
-    name: 'Pastilha de Freio Dianteira',
-    supplier: 'BrakeTech',
-    partNumber: 'PN-1001',
-    expectedKm: 40000,
-    quantity: 50,
-    branch: 'SP',
-  },
-  {
-    id: 'm2',
-    name: 'Filtro de Ar Motor',
-    supplier: 'AirPure',
-    partNumber: 'PN-2022',
-    expectedKm: 20000,
-    quantity: 120,
-    branch: 'RJ',
-  },
-  {
-    id: 'm3',
-    name: 'Pneu Liso 295/80',
-    supplier: 'TireMax',
-    partNumber: 'PN-3033',
-    expectedKm: 120000,
-    quantity: 30,
-    branch: 'MG',
-  },
-]
-
 const mockTests: TestRecord[] = [
   {
     id: 't6',
-    materialId: 'm4',
+    materialId: 'PN-1001',
     prefix: '0052147',
     position: 'Neutra',
     startDate: '2025-11-28',
@@ -75,7 +39,7 @@ const mockTests: TestRecord[] = [
   },
   {
     id: 't1',
-    materialId: 'm1',
+    materialId: 'PN-1001',
     prefix: 'V-101',
     position: 'Roda DE',
     startDate: '2025-01-10',
@@ -86,7 +50,7 @@ const mockTests: TestRecord[] = [
   },
   {
     id: 't2',
-    materialId: 'm2',
+    materialId: 'PN-2022',
     prefix: 'V-205',
     position: 'Motor',
     startDate: '2024-11-01',
@@ -98,7 +62,7 @@ const mockTests: TestRecord[] = [
   },
   {
     id: 't3',
-    materialId: 'm3',
+    materialId: 'PN-3033',
     prefix: 'V-303',
     position: 'Eixo Traseiro',
     startDate: '2024-05-20',
@@ -110,7 +74,7 @@ const mockTests: TestRecord[] = [
   },
   {
     id: 't4',
-    materialId: 'm1',
+    materialId: 'PN-1001',
     prefix: 'V-102',
     position: 'Roda DE',
     startDate: '2024-12-01',
@@ -122,7 +86,7 @@ const mockTests: TestRecord[] = [
   },
   {
     id: 't5',
-    materialId: 'm2',
+    materialId: 'PN-2022',
     prefix: 'V-210',
     position: 'Motor',
     startDate: '2025-02-01',
@@ -140,8 +104,38 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [dateFilter, setDateFilter] = useState<{ from: string; to: string } | null>(null)
   const [prefixFilter, setPrefixFilter] = useState<string>('Todos')
   const [brandFilter, setBrandFilter] = useState<string>('Todas')
-  const [materials, setMaterials] = useState<Material[]>(mockMaterials)
+  const [materials, setMaterials] = useState<Material[]>([])
+  const [isLoadingMaterials, setIsLoadingMaterials] = useState(true)
+  const [materialsError, setMaterialsError] = useState<string | null>(null)
   const [tests, setTests] = useState<TestRecord[]>(mockTests)
+
+  useEffect(() => {
+    let mounted = true
+    const fetchInventory = async () => {
+      setIsLoadingMaterials(true)
+      setMaterialsError(null)
+      try {
+        const data = await getOracleInventory()
+        if (mounted) {
+          setMaterials(data)
+        }
+      } catch (err: any) {
+        if (mounted) {
+          setMaterialsError(
+            err?.message || 'Falha ao sincronizar com o banco de dados do Oracle (Estoque).',
+          )
+        }
+      } finally {
+        if (mounted) {
+          setIsLoadingMaterials(false)
+        }
+      }
+    }
+    fetchInventory()
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   const addMaterial = (mat: Omit<Material, 'id'>) => {
     const newMaterial = { ...mat, id: Math.random().toString(36).substr(2, 9) }
@@ -216,7 +210,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     if (dateFilter) {
       const fromTime = new Date(dateFilter.from).getTime()
-      // Adjust to end of day to include the full 'to' date
       const toTime = new Date(dateFilter.to).getTime() + 86400000 - 1
       result = result.filter((t) => {
         const startTime = new Date(t.startDate).getTime()
@@ -241,6 +234,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     materials,
     addMaterial,
     setMaterials,
+    isLoadingMaterials,
+    materialsError,
     tests,
     startTest,
     endTest,

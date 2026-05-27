@@ -8,12 +8,13 @@ import { StartTestDialog } from './components/StartTestDialog'
 import { EndTestDialog } from './components/EndTestDialog'
 import { UpdateKmDialog } from './components/UpdateKmDialog'
 import { TestRecord } from '@/types'
-import { MoreHorizontal, Flag, RefreshCw } from 'lucide-react'
+import { MoreHorizontal, Flag, RefreshCw, AlertCircle, Loader2 } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { FilterBar } from '@/components/FilterBar'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 
 export default function ActiveTestsPage() {
-  const { filteredTests, filteredMaterials } = useAppStore()
+  const { filteredTests, filteredMaterials, isLoadingMaterials, materialsError } = useAppStore()
   const activeTests = filteredTests.filter(t => t.status === 'ativo')
 
   const [selectedTestEnd, setSelectedTestEnd] = useState<TestRecord | null>(null)
@@ -43,6 +44,13 @@ export default function ActiveTestsPage() {
 
   return (
     <div className="space-y-6">
+      {materialsError && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Erro de Sincronização</AlertTitle>
+          <AlertDescription>Não foi possível carregar os dados de materiais do Oracle: {materialsError}</AlertDescription>
+        </Alert>
+      )}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Testes em Andamento</h2>
@@ -58,19 +66,25 @@ export default function ActiveTestsPage() {
           <CardTitle className="text-lg">Frota em Teste</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader className="bg-muted/50">
-              <TableRow>
-                <TableHead>Veículo / Posição</TableHead>
-                <TableHead>Item (Código / Marca)</TableHead>
-                <TableHead>Data Início</TableHead>
-                <TableHead className="text-right">KM Inicial</TableHead>
-                <TableHead className="w-[200px]">Progresso (Alvo: Esperado)</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {activeTests.map((test) => {
+          {isLoadingMaterials ? (
+            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+              <Loader2 className="h-8 w-8 animate-spin mb-4" />
+              <p>Carregando dados de materiais...</p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader className="bg-muted/50">
+                <TableRow>
+                  <TableHead>Veículo / Posição</TableHead>
+                  <TableHead>Item (Código / Marca)</TableHead>
+                  <TableHead>Data Início</TableHead>
+                  <TableHead className="text-right">KM Inicial</TableHead>
+                  <TableHead className="w-[200px]">Progresso (Alvo: Esperado)</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {activeTests.map((test) => {
                 const material = getMaterial(test.materialId)
                 const expected = material?.expectedKm || 0
                 const progress = calculateProgress(test, expected)
@@ -119,15 +133,16 @@ export default function ActiveTestsPage() {
                   </TableRow>
                 )
               })}
-              {activeTests.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">
-                    Nenhum teste em andamento para esta filial.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                {activeTests.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center h-24 text-muted-foreground">
+                      Nenhum teste em andamento para esta filial.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
 
