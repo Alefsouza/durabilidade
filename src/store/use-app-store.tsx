@@ -12,6 +12,7 @@ interface AppContextType {
   setBrandFilter: (brand: string) => void
   materials: Material[]
   addMaterial: (material: Omit<Material, 'id'>) => void
+  setMaterials: (materials: Material[]) => void
   tests: TestRecord[]
   startTest: (test: Omit<TestRecord, 'id' | 'status'>) => void
   endTest: (id: string, finalKm: number, endDate: string) => void
@@ -239,6 +240,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setBrandFilter,
     materials,
     addMaterial,
+    setMaterials,
     tests,
     startTest,
     endTest,
