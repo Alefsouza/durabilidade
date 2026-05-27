@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-27T17:45:46.435Z",
+  "generatedAt": "2026-05-27T17:48:33.028Z",
   "collections": [
     {
       "name": "users",
@@ -29,19 +29,14 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         }
       ],
       "indexes": [
@@ -113,42 +108,28 @@
           "type": "select",
           "required": true,
           "system": false,
-          "selectValues": [
-            "ativo",
-            "aprovado",
-            "reprovado"
-          ]
+          "selectValues": ["ativo", "aprovado", "reprovado"]
         },
         {
           "name": "branch",
           "type": "select",
           "required": true,
           "system": false,
-          "selectValues": [
-            "SP",
-            "RJ",
-            "MG",
-            "RS"
-          ]
+          "selectValues": ["SP", "RJ", "MG", "RS"]
         },
         {
           "name": "created",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         }
       ],
       "indexes": []
@@ -199,32 +180,21 @@
           "type": "select",
           "required": true,
           "system": false,
-          "selectValues": [
-            "SP",
-            "RJ",
-            "MG",
-            "RS",
-            "Todas"
-          ]
+          "selectValues": ["SP", "RJ", "MG", "RS", "Todas"]
         },
         {
           "name": "created",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         }
       ],
       "indexes": []

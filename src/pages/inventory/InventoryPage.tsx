@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useAppStore } from '@/store/use-app-store'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -10,12 +11,50 @@ import {
 } from '@/components/ui/table'
 import { AddMaterialDialog } from './components/AddMaterialDialog'
 import { FilterBar } from '@/components/FilterBar'
+import { getOracleInventory } from '@/services/inventory'
+import { Loader2, AlertCircle } from 'lucide-react'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 
 export default function InventoryPage() {
-  const { filteredMaterials } = useAppStore()
+  const { filteredMaterials, setMaterials } = useAppStore()
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let mounted = true
+    const fetchInventory = async () => {
+      setIsLoading(true)
+      setError(null)
+      try {
+        const data = await getOracleInventory()
+        if (mounted) {
+          setMaterials(data)
+        }
+      } catch (err: any) {
+        if (mounted) {
+          setError(err?.message || 'Unable to sync with Oracle database')
+        }
+      } finally {
+        if (mounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+    fetchInventory()
+    return () => {
+      mounted = false
+    }
+  }, [setMaterials])
 
   return (
     <div className="space-y-6">
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Erro</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Estoque de Cortesia</h2>
@@ -33,41 +72,50 @@ export default function InventoryPage() {
           <CardTitle className="text-lg">Materiais Disponíveis</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader className="bg-muted/50">
-              <TableRow>
-                <TableHead>Descrição (Peça)</TableHead>
-                <TableHead>Marca / Fornecedor</TableHead>
-                <TableHead>Código (PN)</TableHead>
-                <TableHead className="text-right">KM Esperado</TableHead>
-                <TableHead className="text-right">Qtd.</TableHead>
-                <TableHead className="text-center">Filial</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredMaterials.map((mat) => (
-                <TableRow key={mat.id} className="hover:bg-muted/30 transition-colors">
-                  <TableCell className="font-medium">{mat.name}</TableCell>
-                  <TableCell>{mat.supplier}</TableCell>
-                  <TableCell className="font-mono text-xs">{mat.partNumber}</TableCell>
-                  <TableCell className="text-right">{mat.expectedKm.toLocaleString()} km</TableCell>
-                  <TableCell className="text-right font-medium">{mat.quantity}</TableCell>
-                  <TableCell className="text-center">
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-secondary text-secondary-foreground">
-                      {mat.branch}
-                    </span>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {filteredMaterials.length === 0 && (
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+              <Loader2 className="h-8 w-8 animate-spin mb-4" />
+              <p>Sincronizando com o banco de dados Oracle...</p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader className="bg-muted/50">
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center h-24 text-muted-foreground">
-                    Nenhum material encontrado para esta filial.
-                  </TableCell>
+                  <TableHead>Descrição (Peça)</TableHead>
+                  <TableHead>Marca / Fornecedor</TableHead>
+                  <TableHead>Código (PN)</TableHead>
+                  <TableHead className="text-right">KM Esperado</TableHead>
+                  <TableHead className="text-right">Qtd.</TableHead>
+                  <TableHead className="text-center">Filial</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredMaterials.map((mat) => (
+                  <TableRow key={mat.id} className="hover:bg-muted/30 transition-colors">
+                    <TableCell className="font-medium">{mat.name}</TableCell>
+                    <TableCell>{mat.supplier}</TableCell>
+                    <TableCell className="font-mono text-xs">{mat.partNumber}</TableCell>
+                    <TableCell className="text-right">
+                      {mat.expectedKm.toLocaleString()} km
+                    </TableCell>
+                    <TableCell className="text-right font-medium">{mat.quantity}</TableCell>
+                    <TableCell className="text-center">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-secondary text-secondary-foreground">
+                        {mat.branch}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {filteredMaterials.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center h-24 text-muted-foreground">
+                      Nenhum material encontrado.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>
